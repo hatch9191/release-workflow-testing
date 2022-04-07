@@ -1,8 +1,7 @@
 name: Build Release Notes
 
 on:
-  workflow_dispatch:
-  push:
+  pull:
     branches:
       - trunk
 

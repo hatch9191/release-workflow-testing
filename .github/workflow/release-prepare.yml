@@ -1,6 +1,9 @@
 name: Prepare Release PR
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - trunk
 
 jobs:
   bump-version:
