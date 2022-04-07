@@ -16,8 +16,8 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: cat package.json
-        run: cat ./package.json
+      # - name: cat package.json
+      #   run: cat ./package.json
 
       - name: "Automated Version Bump"
         id: version-bump
@@ -35,8 +35,8 @@ jobs:
           # target-branch: "releases"
           commit-message: "CI: bumps version to {{version}} [skip ci]"
 
-      - name: cat package.json
-        run: cat ./package.json
+      # - name: cat package.json
+      #   run: cat ./package.json
 
       - name: Output Step
         env:
