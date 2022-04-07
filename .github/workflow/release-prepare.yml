@@ -1,0 +1,56 @@
+name: Prepare Release PR
+
+on: workflow_dispatch
+
+jobs:
+  bump-version:
+    name: Bump Version on trunk [develop test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: cat package.json
+        run: cat ./package.json
+
+      - name: "Automated Version Bump"
+        id: version-bump
+        uses: "phips28/gh-action-bump-version@master"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_USER: ${{ secrets.ACTION_USER }}
+          GITHUB_EMAIL: ${{ secrets.ACTION_EMAIL }}
+        with:
+          minor-wording: "add,Adds,new"
+          major-wording: "MAJOR,cut-major,Major,major,breaking change"
+          patch-wording: "fixes,fix,patch,patches"
+          default: minor
+          bump-policy: "all"
+          commit-message: "CI: bumps version to {{version}} [skip ci]"
+
+      - name: cat package.json
+        run: cat ./package.json
+
+      - name: Output Step
+        env:
+          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+        run: echo "new tag $NEW_TAG"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.14.0
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          title: "Release ${{ steps.version-bump.outputs.newTag }}"
+          body: >
+            This PR is auto-generated 
+            for release ${{ steps.version-bump.outputs.newTag }}.
+          labels: automated-pr
+          branch: trunk
