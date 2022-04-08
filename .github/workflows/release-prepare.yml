@@ -50,8 +50,9 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ github.ref }}
-          body: ${{steps.github_release.outputs.changelog}}
+          tag: ${{ steps.version-bump.outputs.newTag }}
+          name: Release ${{ steps.version-bump.outputs.newTag }}
+          body: ${{ steps.github_release.outputs.changelog }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request
