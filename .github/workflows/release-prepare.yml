@@ -37,24 +37,18 @@ jobs:
           NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
         run: echo "new tag $NEW_TAG"
 
-      - name: Get base branch
-        id: vars
-        run: |
-          base_ref=${{ github.head_ref || github.ref }}
-          echo ::set-output name=base_branch::${base_ref#refs/*/}
-
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: ${{ steps.vars.outputs.base_branch }}
+          base: develop
           title: "Release ${{ steps.version-bump.outputs.newTag }}"
           body: |
             This PR is auto-generated
             for release ${{ steps.version-bump.outputs.newTag }}.
           labels: automated-pr
-          branch: develop
+          branch: trunk
 
       - name: Check outputs
         if: steps.cpr.outputs.pull-request-number
