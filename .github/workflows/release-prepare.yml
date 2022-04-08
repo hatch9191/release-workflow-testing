@@ -32,18 +32,25 @@ jobs:
           # target-branch: "releases"
           commit-message: "CI: bumps version to {{version}} [skip ci]"
 
-      - name: Output Step
+      - name: Version Bump Output
         env:
           NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
         run: echo "new tag $NEW_TAG"
-        
+
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v3.14.0
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: develop
           title: "Release ${{ steps.version-bump.outputs.newTag }}"
           body: |
             This PR is auto-generated
             for release ${{ steps.version-bump.outputs.newTag }}.
           labels: automated-pr
-          branch: develop
+          branch: trunk
+
+      - name: Check outputs
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"; exit 1;
