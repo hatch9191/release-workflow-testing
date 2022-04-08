@@ -16,9 +16,8 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Get Previous tag
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
 
       - name: Automated Version Bump
         id: version-bump
@@ -64,7 +63,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          fromTag: ${{ steps.previoustag.outputs.tag }}
+          fromTag: ${{ steps.get-latest-tag.outputs.tag }}
           toTag: ${{ steps.version-bump.outputs.newTag }}
 
       - name: Create Release
