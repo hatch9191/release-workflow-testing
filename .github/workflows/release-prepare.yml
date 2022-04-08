@@ -36,25 +36,6 @@ jobs:
           NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
         run: echo "new tag $NEW_TAG"
 
-      - name: Build Changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.version-bump.outputs.newTag }}
-          name: Release ${{ steps.version-bump.outputs.newTag }}
-          body: ${{ steps.github_release.outputs.changelog }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.14.0
@@ -67,3 +48,25 @@ jobs:
             for release ${{ steps.version-bump.outputs.newTag }}.
           labels: automated-pr
           branch: trunk
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fromTag: git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`
+          toTag: ${{ steps.version-bump.outputs.newTag }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.version-bump.outputs.newTag }}
+          name: Release ${{ steps.version-bump.outputs.newTag }}
+          body: ${{ steps.github_release.outputs.changelog }}
+          token: ${{ secrets.GITHUB_TOKEN }}
