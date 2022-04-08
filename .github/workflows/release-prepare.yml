@@ -1,4 +1,4 @@
-name: Prepare Release PR
+name: Prepare Release
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: "Automated Version Bump"
+      - name: Automated Version Bump
         id: version-bump
         uses: "phips28/gh-action-bump-version@master"
         env:
@@ -29,7 +29,6 @@ jobs:
           patch-wording: "fixes,fix,patch,patches"
           default: minor
           bump-policy: "all"
-          # target-branch: "releases"
           commit-message: "CI: bumps version to {{version}} [skip ci]"
 
       - name: Version Bump Output
@@ -43,6 +42,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
+      #     body: ${{steps.github_release.outputs.changelog}}
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3.14.0
@@ -55,8 +69,3 @@ jobs:
             for release ${{ steps.version-bump.outputs.newTag }}.
           labels: automated-pr
           branch: trunk
-
-      - name: Check outputs
-        if: steps.cpr.outputs.pull-request-number
-        run: |
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"; exit 1;
