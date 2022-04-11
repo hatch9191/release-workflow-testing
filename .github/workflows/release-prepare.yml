@@ -32,6 +32,7 @@ jobs:
           patch-wording: "fixes,fix,patch,patches"
           default: minor
           bump-policy: "all"
+          target-branch: "releases"
           commit-message: "CI: bumps version to {{version}} [skip ci]"
 
       - name: Version Bump Output
@@ -50,7 +51,7 @@ jobs:
             This PR is auto-generated
             for release ${{ steps.version-bump.outputs.newTag }}.
           labels: automated-pr
-          branch: trunk
+          branch: releases
 
       - name: Checkout
         uses: actions/checkout@v3
